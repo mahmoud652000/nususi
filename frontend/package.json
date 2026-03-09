@@ -1,25 +1,24 @@
 {
-  "name": "nususi-backend",
+  "name": "nususi-frontend",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "engines": {
-    "node": "18.x"
-  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "jsonwebtoken": "^9.0.1",
-    "bcryptjs": "^2.4.3",
-    "multer": "^1.4.5-lts.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.14.1",
+    "react-hot-toast": "^2.4.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "@vitejs/plugin-react": "^5.1.4",
+    "vite": "^5.0.0",
+    "tailwindcss": "^3.3.3",
+    "postcss": "^8.4.33",
+    "autoprefixer": "^10.4.15",
+    "@tailwindcss/postcss": "^1.0.0"
   }
 }
