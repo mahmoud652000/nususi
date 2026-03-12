@@ -52,7 +52,7 @@ export default function ReadBook() {
     );
   }
 
-  const pdfUrl = `https://nususi-i5st.vercel.app/register${book.fileUrl}`;
+  const pdfUrl = `https://nususi-i5st.vercel.app/${book.fileUrl}`;
 
   return (
     <div className="min-h-screen bg-gray-900">
