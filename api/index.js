@@ -17,9 +17,9 @@ mongoose.connect(process.env.MONGODB_URI)
 .catch(err => console.log(err));
 
 // Routes
-app.use("/api/auth", require("../routes/auth"));
-app.use("/api/books", require("../routes/books"));
-app.use("/api/upload", require("../routes/upload"));
-app.use("/api/dashboard", require("../routes/dashboard"));
+app.use("/api/auth", require("../backend/routes/auth"));
+app.use("/api/books", require("../backend/routes/books"));
+app.use("/api/upload", require("../backend/routes/upload"));
+app.use("/api/dashboard", require("../backend/routes/dashboard"));
 
 module.exports = serverless(app);
