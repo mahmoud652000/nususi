@@ -14,7 +14,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'your_mongo_uri_here';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://gamal:gamal@cluster0.wavjzfc.mongodb.net/nususi?retryWrites=true&w=majority';
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
