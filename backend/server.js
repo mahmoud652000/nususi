@@ -1,40 +1,19 @@
-const path = require('path');
-const open = require('open');
+// api/index.js
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const mongoose = require('mongoose');
+const authRoutes = require('./auth');
+const booksRoutes = require('./books');
+const uploadRoutes = require('./upload');
 
-dotenv.config();
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://gamal:gamal@cluster0.wavjzfc.mongodb.net/nususi?retryWrites=true&w=majority';
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/books', require('./routes/books'));
-app.use('/api/upload', require('./routes/upload'));
-app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/auth', authRoutes);
+app.use('/api/books', booksRoutes);
+app.use('/api/upload', uploadRoutes);
 
-// Serve Frontend
-const frontendPath = path.join(__dirname, '../frontend/dist');
-app.use(express.static(frontendPath));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  open(`https://nususi-i5st.vercel.app/${PORT}`); // يفتح الموقع تلقائيًا
-});
+module.exports = app; // هكذا Vercel يعرف كيف يشغل السيرفر
