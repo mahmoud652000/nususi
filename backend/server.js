@@ -19,7 +19,7 @@ app.use("/api/upload", require("./routes/upload"));
 app.use("/api/dashboard", require("./routes/dashboard"));
 
 // favicon fix
-app.get("/favicon.ico", (req, res) => res.status(204).end());
+app.get("/frontend/dist/favicon.ico", (req, res) => res.status(204).end());
 
 // 🚀 تشغيل السيرفر
 const PORT = process.env.PORT || 5000;
