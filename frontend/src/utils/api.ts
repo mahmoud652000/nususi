@@ -1,8 +1,10 @@
 import axios from 'axios';
 import type { Book } from '@/types';
 
+// 🌐 رابط الـ API
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+// إنشاء instance لـ axios
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,18 +12,34 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
+// 🛡️ إضافة التوكن تلقائياً إلى كل الطلبات
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
 
-  if (token) {
+  if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
 });
 
+// ⚠️ التعامل مع الأخطاء (مثل انتهاء صلاحية التوكن)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // إذا انتهت صلاحية التوكن
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login'; // إعادة التوجيه لتسجيل الدخول
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+// =========================
 // Auth API
+// =========================
 export const authAPI = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
@@ -35,7 +53,9 @@ export const authAPI = {
     api.put('/auth/profile', { name }),
 };
 
+// =========================
 // Books API
+// =========================
 export const booksAPI = {
   getAll: (params?: {
     category?: string;
@@ -63,7 +83,9 @@ export const booksAPI = {
     api.post(`/books/${id}/download`),
 };
 
+// =========================
 // Upload API
+// =========================
 export const uploadAPI = {
   uploadBook: (formData: FormData) =>
     api.post('/upload/book', formData, {
@@ -76,7 +98,9 @@ export const uploadAPI = {
     }),
 };
 
+// =========================
 // Dashboard API
+// =========================
 export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
 
