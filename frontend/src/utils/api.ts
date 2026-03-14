@@ -1,11 +1,12 @@
 import axios from 'axios';
+import type { Book } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://backendnnususi-production.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', // ✅ JSON default
   },
 });
 
@@ -18,7 +19,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth API
+// ---------------- Auth API ----------------
 export const authAPI = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
@@ -28,7 +29,7 @@ export const authAPI = {
   updateProfile: (name: string) => api.put('/auth/profile', { name }),
 };
 
-// Books API
+// ---------------- Books API ----------------
 export const booksAPI = {
   getAll: (params?: { category?: string; search?: string; page?: number; limit?: number }) =>
     api.get('/books', { params }),
@@ -41,19 +42,15 @@ export const booksAPI = {
   incrementDownload: (id: string) => api.post(`/books/${id}/download`),
 };
 
-// Upload API
+// ---------------- Upload API (مصححة) ----------------
 export const uploadAPI = {
   uploadBook: (formData: FormData) =>
-    api.post('/upload/book', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    api.post('/upload/book', formData), // ✅ لا تحدد Content-Type يدويًا
   uploadCover: (formData: FormData) =>
-    api.post('/upload/cover', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    api.post('/upload/cover', formData), // ✅ Axios يتعامل مع FormData تلقائيًا
 };
 
-// Dashboard API
+// ---------------- Dashboard API ----------------
 export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
   getUserStats: () => api.get('/dashboard/user-stats'),
@@ -64,5 +61,3 @@ export const dashboardAPI = {
 };
 
 export default api;
-
-import type { Book } from '@/types';
