@@ -93,7 +93,7 @@ router.post('/cover', auth, upload.single('cover'), async (req, res) => {
       return res.status(400).json({ message: 'Please upload an image' });
     }
 
-    const coverUrl = `/uploads/${req.file.filename}`;
+    const coverUrl = `/backend/uploads/${req.file.filename}`;
     res.json({ coverUrl });
   } catch (error) {
     console.error('Cover upload error:', error);
