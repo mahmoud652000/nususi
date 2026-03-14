@@ -91,7 +91,7 @@ export default function BookDetail() {
                     قراءة الكتاب
                   </Link>
                   <a
-                    href={`http://localhost:5000/${book.fileUrl}`}
+                    href={`https://backendnnususi-production.up.railway.app/api${book.fileUrl}`}
                     download
                     onClick={handleDownload}
                     className="flex-1 bg-amber-500 text-white text-center py-3 rounded-xl hover:bg-amber-600 transition font-bold"

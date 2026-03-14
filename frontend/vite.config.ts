@@ -15,13 +15,13 @@ export default defineConfig({
     proxy: {
       // جميع طلبات API
       '/api': {
-        target: 'http://localhost:5000/',
+        target: 'https://backendnnususi-production.up.railway.app/api',
         changeOrigin: true,
         secure: false, // لحل مشاكل SSL أثناء التطوير
       },
       // تحميل الصور أو الملفات من uploads
       '/uploads': {
-        target: 'http://localhost:5000/',
+        target: 'https://backendnnususi-production.up.railway.app/api',
         changeOrigin: true,
         secure: false,
       },

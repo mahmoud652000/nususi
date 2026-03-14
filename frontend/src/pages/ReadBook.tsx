@@ -52,7 +52,7 @@ export default function ReadBook() {
     );
   }
 
-  const pdfUrl = `http://localhost:5000/${book.fileUrl}`;
+  const pdfUrl = `https://backendnnususi-production.up.railway.app/api${book.fileUrl}`;
 
   return (
     <div className="min-h-screen bg-gray-900">
