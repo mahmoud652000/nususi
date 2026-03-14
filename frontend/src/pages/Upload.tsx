@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadAPI } from '@/utils/api';
-import { Upload as UploadIcon, FileText, X, Check, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const categories = [
@@ -63,20 +62,16 @@ export default function Upload() {
 
     try {
       const data = new FormData();
-      data.append('file', selectedFile);        // ملف PDF
-      data.append('fileSize', String(selectedFile.size)); // الحجم بالبايت
-      if (coverFile) data.append('cover', coverFile); // غلاف اختياري
+      data.append('file', selectedFile);
+      if (coverFile) data.append('cover', coverFile);
 
-      data.append('title', formData.title);
-      data.append('author', formData.author);
-      data.append('category', formData.category);
-      data.append('description', formData.description);
-      data.append('year', formData.year);
-      data.append('pages', formData.pages || '0');
-      data.append('status', formData.status);
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) data.append(key, value);
+      });
+
       data.append('userId', userId);
-      data.append('downloads', '0'); // القيمة الافتراضية
-      data.append('views', '0'); // القيمة الافتراضية
+      data.append('downloads', '0');
+      data.append('views', '0');
 
       await uploadAPI.uploadBook(data);
 
@@ -99,19 +94,16 @@ export default function Upload() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit}>
-            {/* PDF Upload */}
             <div className="mb-6">
               <label className="block text-gray-700 font-bold mb-3">ملف الكتاب (PDF) *</label>
               <input type="file" accept=".pdf" onChange={(e) => handleFileSelect(e)} />
             </div>
 
-            {/* Cover Upload */}
             <div className="mb-6">
               <label className="block text-gray-700 font-bold mb-3">غلاف الكتاب (اختياري)</label>
               <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, true)} />
             </div>
 
-            {/* Book Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <input
                 type="text"
