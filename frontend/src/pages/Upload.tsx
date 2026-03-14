@@ -25,8 +25,10 @@ export default function Upload() {
     title: '',
     author: '',
     category: '',
-    year: '',
     description: '',
+    year: '',
+    pages: '',
+    status: 'approved',
   });
 
   const userId = '64fa2b1234567890abcdef12'; // ضع هنا ObjectId للمستخدم الحالي
@@ -52,13 +54,8 @@ export default function Upload() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.author || !formData.category) {
-      toast.error('يرجى ملء جميع الحقول المطلوبة');
-      return;
-    }
-
-    if (!selectedFile) {
-      toast.error('يرجى اختيار ملف PDF');
+    if (!formData.title || !formData.author || !formData.category || !selectedFile) {
+      toast.error('يرجى ملء جميع الحقول المطلوبة ورفع ملف الكتاب');
       return;
     }
 
@@ -66,16 +63,21 @@ export default function Upload() {
 
     try {
       const data = new FormData();
-      data.append('file', selectedFile);        // pdf
-      if (coverFile) data.append('cover', coverFile); // cover optional
+      data.append('file', selectedFile);        // ملف PDF
+      data.append('fileSize', String(selectedFile.size)); // الحجم بالبايت
+      if (coverFile) data.append('cover', coverFile); // غلاف اختياري
+
       data.append('title', formData.title);
       data.append('author', formData.author);
       data.append('category', formData.category);
-      data.append('year', formData.year);
       data.append('description', formData.description);
+      data.append('year', formData.year);
+      data.append('pages', formData.pages || '0');
+      data.append('status', formData.status);
       data.append('userId', userId);
+      data.append('downloads', '0'); // القيمة الافتراضية
+      data.append('views', '0'); // القيمة الافتراضية
 
-      // هنا استدعاء API الخاص بالرفع
       await uploadAPI.uploadBook(data);
 
       toast.success('تم رفع الكتاب بنجاح!');
@@ -144,13 +146,34 @@ export default function Upload() {
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <input
+                type="number"
+                placeholder="عدد صفحات الكتاب"
+                value={formData.pages}
+                onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
+              />
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              >
+                <option value="approved">موافق عليه</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="rejected">مرفوض</option>
+              </select>
+            </div>
+
             <textarea
               placeholder="وصف الكتاب"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
 
-            <button type="submit" disabled={isUploading}>
+            <button
+              type="submit"
+              disabled={isUploading}
+              className="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50"
+            >
               {isUploading ? 'جاري رفع الكتاب...' : 'رفع الكتاب'}
             </button>
           </form>
