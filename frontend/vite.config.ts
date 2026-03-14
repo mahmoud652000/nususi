@@ -13,11 +13,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://nususi-i5st.vercel.app/', // رابط الـ Backend بعد النشر
+        target: 'https://nususi-production.up.railway.app/api', // رابط الـ Backend بعد النشر
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'https://nususi-i5st.vercel.app/', // رابط الـ Backend بعد النشر
+        target: 'https://nususi-production.up.railway.app/api', // رابط الـ Backend بعد النشر
         changeOrigin: true,
       },
     },
