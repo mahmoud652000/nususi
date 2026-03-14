@@ -6,29 +6,27 @@ const serverless = require("serverless-http");
 const path = require("path");
 
 dotenv.config();
+
 const app = express();
 
-// Middleware
+/* Middleware */
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+/* MongoDB */
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.error("MongoDB Error:", err));
 
-// Routes
-app.use("/api/auth", require("./auth"));
-app.use("/api/books", require("./books"));
-app.use("/api/upload", require("./upload"));
-app.use("/api/dashboard", require("./dashboard"));
+/* API Routes */
+app.use("/api/auth", require("../backend/auth"));
+app.use("/api/books", require("../backend/books"));
+app.use("/api/upload", require("../backend/upload"));
+app.use("/api/dashboard", require("../backend/dashboard"));
 
-// Serve frontend
-const frontendPath = path.join(__dirname, "../frontend/dist");
-app.use(express.static(frontendPath));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
+/* favicon fix */
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// Export serverless handler
+/* Export */
 module.exports = serverless(app);
