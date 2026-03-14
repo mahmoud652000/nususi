@@ -26,7 +26,7 @@ app.use("/api/upload", require("../backend/upload"));
 app.use("/api/dashboard", require("../backend/dashboard"));
 
 /* favicon fix */
-app.get("/favicon.ico", (req, res) => res.status(204).end());
+app.get("../frontend/dist/favicon.ico", (req, res) => res.status(204).end());
 
 /* Export */
 module.exports = serverless(app);
