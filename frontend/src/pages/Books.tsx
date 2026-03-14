@@ -188,7 +188,7 @@ function BookCard({ book }: { book: Book }) {
             قراءة
           </Link>
           <a
-            href={`https://nususi-i5st.vercel.app/${book.fileUrl}`}
+            href={`http://localhost:5000/${book.fileUrl}`}
             download
             className="flex-1 bg-gray-100 text-gray-700 text-center py-2 rounded-lg hover:bg-gray-200 transition text-sm"
             onClick={() => booksAPI.incrementDownload(book._id)}
