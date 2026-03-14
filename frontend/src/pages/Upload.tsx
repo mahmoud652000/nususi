@@ -20,6 +20,7 @@ export default function Upload() {
   const navigate = useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -28,19 +29,24 @@ export default function Upload() {
     description: '',
   });
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const userId = '64fa2b1234567890abcdef12'; // ضع هنا ObjectId للمستخدم الحالي
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, isCover = false) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
-        toast.error('يرجى اختيار ملف PDF فقط');
-        return;
-      }
-      if (file.size > 50 * 1024 * 1024) {
-        toast.error('حجم الملف كبير جداً. الحد الأقصى 50 ميجابايت');
-        return;
-      }
-      setSelectedFile(file);
+    if (!file) return;
+
+    if (!isCover && file.type !== 'application/pdf') {
+      toast.error('يرجى اختيار ملف PDF فقط');
+      return;
     }
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('حجم الملف كبير جداً. الحد الأقصى 50 ميجابايت');
+      return;
+    }
+
+    if (isCover) setCoverFile(file);
+    else setSelectedFile(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,14 +66,18 @@ export default function Upload() {
 
     try {
       const data = new FormData();
-      data.append('pdf', selectedFile);
+      data.append('file', selectedFile);        // pdf
+      if (coverFile) data.append('cover', coverFile); // cover optional
       data.append('title', formData.title);
       data.append('author', formData.author);
       data.append('category', formData.category);
       data.append('year', formData.year);
       data.append('description', formData.description);
+      data.append('userId', userId);
 
+      // هنا استدعاء API الخاص بالرفع
       await uploadAPI.uploadBook(data);
+
       toast.success('تم رفع الكتاب بنجاح!');
       navigate('/books');
     } catch (error: any) {
@@ -87,139 +97,61 @@ export default function Upload() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit}>
-            {/* File Upload */}
-            <div className="mb-8">
-              <label className="block text-gray-700 font-bold mb-3">ملف PDF *</label>
-              <div
-                className={`border-2 border-dashed rounded-2xl p-8 text-center transition ${
-                  selectedFile
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-300 hover:border-purple-500 hover:bg-purple-50'
-                }`}
-              >
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="pdf-upload"
-                />
-                <label htmlFor="pdf-upload" className="cursor-pointer">
-                  {selectedFile ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <Check className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-900">{selectedFile.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {(selectedFile.size / 1024 / 1024).toFixed(2)} ميجابايت
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setSelectedFile(null);
-                        }}
-                        className="p-2 hover:bg-red-100 rounded-full transition"
-                      >
-                        <X className="w-5 h-5 text-red-500" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <UploadIcon className="w-8 h-8 text-purple-600" />
-                      </div>
-                      <p className="font-bold text-gray-700 mb-2">انقر لاختيار ملف PDF</p>
-                      <p className="text-gray-500 text-sm">أو اسحب الملف هنا</p>
-                      <p className="text-gray-400 text-xs mt-2">الحد الأقصى: 50 ميجابايت</p>
-                    </>
-                  )}
-                </label>
-              </div>
+            {/* PDF Upload */}
+            <div className="mb-6">
+              <label className="block text-gray-700 font-bold mb-3">ملف الكتاب (PDF) *</label>
+              <input type="file" accept=".pdf" onChange={(e) => handleFileSelect(e)} />
+            </div>
+
+            {/* Cover Upload */}
+            <div className="mb-6">
+              <label className="block text-gray-700 font-bold mb-3">غلاف الكتاب (اختياري)</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, true)} />
             </div>
 
             {/* Book Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">عنوان الكتاب *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-xl focus:border-purple-600 focus:outline-none"
-                  placeholder="أدخل عنوان الكتاب"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">المؤلف *</label>
-                <input
-                  type="text"
-                  value={formData.author}
-                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-xl focus:border-purple-600 focus:outline-none"
-                  placeholder="اسم المؤلف"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">التصنيف *</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-xl focus:border-purple-600 focus:outline-none"
-                >
-                  <option value="">اختر التصنيف</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">سنة النشر</label>
-                <input
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-xl focus:border-purple-600 focus:outline-none"
-                  placeholder="2024"
-                />
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <label className="block text-gray-700 font-bold mb-2">وصف الكتاب</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-4 py-3 border rounded-xl focus:border-purple-600 focus:outline-none"
-                rows={4}
-                placeholder="اكتب وصفاً مختصراً للكتاب..."
+              <input
+                type="text"
+                placeholder="عنوان الكتاب *"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="المؤلف *"
+                value={formData.author}
+                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isUploading}
-              className="w-full bg-gradient-to-r from-purple-700 to-amber-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  جاري رفع الكتاب...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-5 h-5" />
-                  رفع الكتاب
-                </>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              >
+                <option value="">اختر التصنيف *</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+
+              <input
+                type="number"
+                placeholder="سنة النشر"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+              />
+            </div>
+
+            <textarea
+              placeholder="وصف الكتاب"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+
+            <button type="submit" disabled={isUploading}>
+              {isUploading ? 'جاري رفع الكتاب...' : 'رفع الكتاب'}
             </button>
           </form>
         </div>
